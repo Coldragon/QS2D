@@ -1,6 +1,6 @@
 Quick SDL2 Draw
 
-A basic drawing header only library but need SDL2
+A basic drawing C/C++ header only library but need SDL2
 
 ```c
 #define QS2D_IMPLEMENTATION
