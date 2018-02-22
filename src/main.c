@@ -165,8 +165,7 @@ float noise2d(float x, float y)
 	int v = noise2(x_int + 1, y_int + 1);
 	float low = smooth_inter(s, t, x_frac);
 	float high = smooth_inter(u, v, x_frac);
-	return smooth_inter(low, high, y_frac);
-}
+	return smooth_inter(low, high, y_frac);}
 
 float perlin2d(float x, float y, float freq, int depth)
 {
@@ -196,6 +195,7 @@ main(int argc, char *argv[]){
 	QS2D_Init("Perlin Noise2 Boy !", w, h);
 
 	for (int x = 0; x < w; x++)
+	{
 		for (int y = 0; y < h; y++)
 		{
 			float value = (perlin2d(x, y, 0.02f, 5) + 1) * 0.5f * 255;
@@ -203,8 +203,17 @@ main(int argc, char *argv[]){
 			QS2D_SetColor(c);
 			QS2D_Pixel(x, y);
 		}
+		QS2D_Render();
+	}
+		
 
-	while (!QS2D_Event()) {}
+	while (!QS2D_Event())
+	{
+		if(QS2D_Key(QS2D_KEY_RETURN))
+		{
+			QS2D_ScreenShot();
+		}
+	}
 
 	QS2D_Close();
 
