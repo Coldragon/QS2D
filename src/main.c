@@ -123,7 +123,6 @@ int main(){
 
 static int SEED;
 
-
 static int hash[] = { 208,34,231,213,32,248,233,56,161,78,24,140,71,48,140,254,245,255,247,247,40,
 185,248,251,245,28,124,204,204,76,36,1,107,28,234,163,202,224,245,128,167,204,
 9,92,217,54,239,174,173,102,193,189,190,121,100,108,167,44,43,77,180,204,8,81,
@@ -137,24 +136,20 @@ static int hash[] = { 208,34,231,213,32,248,233,56,161,78,24,140,71,48,140,254,2
 135,176,183,191,253,115,184,21,233,58,129,233,142,39,128,211,118,137,139,255,
 114,20,218,113,154,27,127,246,250,1,8,198,250,209,92,222,173,21,88,102,219 };
 
-int noise2(int x, int y)
-{
+int noise2(int x, int y){
 	int tmp = hash[(y + SEED) % 256];
 	return hash[(tmp + x) % 256];
 }
 
-float lin_inter(float x, float y, float s)
-{
+float lin_inter(float x, float y, float s){
 	return x + s * (y - x);
 }
 
-float smooth_inter(float x, float y, float s)
-{
+float smooth_inter(float x, float y, float s){
 	return lin_inter(x, y, s * s * (3 - 2 * s));
 }
 
-float noise2d(float x, float y)
-{
+float noise2d(float x, float y){
 	int x_int = x;
 	int y_int = y;
 	float x_frac = x - x_int;
@@ -167,8 +162,7 @@ float noise2d(float x, float y)
 	float high = smooth_inter(u, v, x_frac);
 	return smooth_inter(low, high, y_frac);}
 
-float perlin2d(float x, float y, float freq, int depth)
-{
+float perlin2d(float x, float y, float freq, int depth){
 	float xa = x * freq;
 	float ya = y * freq;
 	float amp = 1.0;
@@ -176,8 +170,7 @@ float perlin2d(float x, float y, float freq, int depth)
 	float div = 0.0;
 
 	int i;
-	for (i = 0; i<depth; i++)
-	{
+	for (i = 0; i<depth; i++){
 		div += 256 * amp;
 		fin += noise2d(xa, ya) * amp;
 		amp /= 2;
@@ -188,16 +181,13 @@ float perlin2d(float x, float y, float freq, int depth)
 	return fin / div;
 }
 
-int
-main(int argc, char *argv[]){
+int main(int argc, char *argv[]){
 	SEED = time(NULL);
 	int w = 1280, h = 720;
 	QS2D_Init("Perlin Noise2 Boy !", w, h);
 
-	for (int x = 0; x < w; x++)
-	{
-		for (int y = 0; y < h; y++)
-		{
+	for (int x = 0; x < w; x++){
+		for (int y = 0; y < h; y++){
 			float value = (perlin2d(x, y, 0.02f, 5) + 1) * 0.5f * 255;
 			QS2D_Color c = { value, value, value, 255 };
 			QS2D_SetColor(c);
@@ -207,11 +197,21 @@ main(int argc, char *argv[]){
 	}
 		
 
-	while (!QS2D_Event())
-	{
-		if(QS2D_Key(QS2D_KEY_RETURN))
-		{
-			QS2D_ScreenShot();
+	while (!QS2D_Event()){
+		if(QS2D_Key(QS2D_KEY_RETURN)){
+			QS2D_ScreenShot("screen.bmp");
+		}
+		if(QS2D_Key(QS2D_KEY_SPACE)){
+			SEED = rand()%(rand()%200)*rand();
+			for (int x = 0; x < w; x++){
+				for (int y = 0; y < h; y++){
+					float value = (perlin2d(x, y, 0.02f, 5) + 1) * 0.5f * 255;
+					QS2D_Color c = { value, value, value, 255 };
+					QS2D_SetColor(c);
+					QS2D_Pixel(x, y);
+				}
+				QS2D_Render();
+			}
 		}
 	}
 
@@ -224,14 +224,11 @@ main(int argc, char *argv[]){
 
 #if MAIN_EX == 4
 
-int
-main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]){
 	int w = 800, h = 480;
 	QS2D_Init("Test", w, h);
 
-	while (!QS2D_Event())
-	{
+	while (!QS2D_Event()){
 		
 	}
 
