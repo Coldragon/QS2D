@@ -16,11 +16,11 @@
 
 //////////////////////////////////
 /*
-	   Macro
+		Preproc
 				*/
 //////////////////////////////////
 
-#define QS2D_VERSION_CHAR "0.1a"
+#define QS2D_VERSION "005"
 
 #ifdef QS2D_USE_STATIC
 	#define QS2D_DEF static
