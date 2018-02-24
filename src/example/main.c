@@ -15,7 +15,8 @@
 
 
 #define QS2D_IMPLEMENTATION
-#include "hdr/qs2d.h"
+#include "../_qs2d.h"
+#include <string.h>
 
 
 #if MAIN_EX == 1
@@ -50,8 +51,7 @@ float PerlinPinPin(float x, float y, float res){
 	static unsigned int assigned[256];
 	static bool trigger = true;
 	if (trigger){
-		for (int i = 0; i < 256; i++)
-			assigned[i] = -1;
+		memset(assigned, -1, 256*sizeof(*assigned));
 
 		for (int i = 0; i < 256; i++){
 			int nb;

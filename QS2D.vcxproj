@@ -128,10 +128,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\hdr\qs2d.h" />
+    <ClCompile Include="src\example\main.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.c" />
+    <ClInclude Include="src\Data.h" />
+    <ClInclude Include="src\Enum.h" />
+    <ClInclude Include="src\Functions.h" />
+    <ClInclude Include="src\Inline.h" />
+    <ClInclude Include="src\Preprocessor.h" />
+    <ClInclude Include="src\Prototypes.h" />
+    <ClInclude Include="src\DataTypes.h" />
+    <ClInclude Include="src\_qs2d.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

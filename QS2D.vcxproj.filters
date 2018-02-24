@@ -1,21 +1,42 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="hdr">
+    <Filter Include="src">
       <UniqueIdentifier>{6f75dac4-9d88-46cb-abde-3f1dcf393556}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src">
-      <UniqueIdentifier>{71b93156-c1a7-49ac-ad9b-ef7706a48c6b}</UniqueIdentifier>
+    <Filter Include="example">
+      <UniqueIdentifier>{80b9f5d4-714a-4ad2-a5a8-1d05834deef0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.c">
-      <Filter>src</Filter>
+    <ClCompile Include="src\example\main.c">
+      <Filter>example</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\hdr\qs2d.h">
-      <Filter>hdr</Filter>
+    <ClInclude Include="src\_qs2d.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Prototypes.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Enum.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Functions.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Preprocessor.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Inline.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DataTypes.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,102 +1,54 @@
 ///////////////////////////////////////////////////////////////////////
 ///////////                Quick SDL2 Drawer              /////////////
 ///////////////////////////////////////////////////////////////////////
-
-
-
 /* 
  * Simple and quick layer for SDL2 to show a window and draw pixel on it.
  * 
  * 
  * Licence at the end of the file
 */
-
 #ifndef QS2D_INCLUDE_QS2D_H
 #define QS2D_INCLUDE_QS2D_H
-
-//////////////////////////////////
-/*
-		Preproc
-				*/
-//////////////////////////////////
-
-#define QS2D_VERSION "005"
-
-#ifdef QS2D_USE_STATIC
-	#define QS2D_DEF static
-#else
-	#define QS2D_DEF extern
-#endif
-
-#ifdef QS2D_USE_DOUBLE
-	#define QS2D_Float double
-#else
-	#define QS2D_Float float
-#endif
-
-
-//////////////////////////////////
-/*
-	 Include
-				*/
- //////////////////////////////////
-
 #include <SDL2/SDL.h>
 #include <stdbool.h>
-
-//////////////////////////////////
- /*
-	 Typedef
-				*/
-//////////////////////////////////
-
+#define QS2D_VERSION "005"
+#ifdef QS2D_USE_STATIC
+#define QS2D_DEF static
+#else
+#define QS2D_DEF extern
+#endif
+#ifdef QS2D_USE_DOUBLE
+#define QS2D_Float double
+#else
+#define QS2D_Float float
+#endif
 typedef struct QS2D_Color { Uint8 r, g, b, a; } QS2D_Color;
 typedef struct QS2D_Input { bool key[512]; } QS2D_Input;
-typedef struct QS2D_Data { 
-	SDL_Window *window; 
-	SDL_Renderer *render; 
+typedef struct QS2D_Data {
+	SDL_Window *window;
+	SDL_Renderer *render;
 	QS2D_Input input;
-	bool quit; 
-	bool renderOnEvent; int w, h; 
+	bool quit;
+	bool renderOnEvent; int w, h;
 } QS2D_Data;
 typedef struct QS2D_Point { QS2D_Float x, y; } QS2D_Point;
-
-//////////////////////////////////
-/*
-	Prototypes    
-				*/
-//////////////////////////////////
-
-/* init */
 QS2D_DEF void QS2D_Init(char* name, const int width, const int height);
 QS2D_DEF void QS2D_Close();
-
-/* rendering */
 QS2D_DEF void QS2D_Render();
 QS2D_DEF void QS2D_Clear();
 QS2D_DEF void QS2D_AutoRender();
 QS2D_DEF void QS2D_ManualRender();
-
-/* event */
 QS2D_DEF int QS2D_Event();
 QS2D_DEF void QS2D_Quit();
 QS2D_DEF bool QS2D_Key(int button);
-
-/* drawing */
 QS2D_DEF QS2D_Color QS2D_NewColor(const Uint8 r, const Uint8 g, const Uint8 b, const Uint8 a);
 QS2D_DEF void QS2D_SetColor(QS2D_Color c);
 QS2D_DEF void QS2D_Pixel(int x, int y);
 QS2D_DEF void QS2D_ScreenShot(char* path_name);
-
-/* window */
 QS2D_DEF void QS2D_ResizeWin(int w, int h);
 QS2D_DEF int QS2D_GetWinW();
 QS2D_DEF int QS2D_GetWinH();
-
-/* value */
 QS2D_DEF QS2D_Color QS2D_GetPixel(int x, int y);
-
-// ENUM OF INPUT FROM SDL2
 enum
 {
 	QS2D_KEY_UNKNOWN = 0,
@@ -145,11 +97,11 @@ enum
 	QS2D_KEY_EQUALS = 46,
 	QS2D_KEY_LEFTBRACKET = 47,
 	QS2D_KEY_RIGHTBRACKET = 48,
-	QS2D_KEY_BACKSLASH = 49,    
-	QS2D_KEY_NONUSHASH = 50,    
+	QS2D_KEY_BACKSLASH = 49,
+	QS2D_KEY_NONUSHASH = 50,
 	QS2D_KEY_SEMICOLON = 51,
 	QS2D_KEY_APOSTROPHE = 52,
-	QS2D_KEY_GRAVE = 53,     
+	QS2D_KEY_GRAVE = 53,
 	QS2D_KEY_COMMA = 54,
 	QS2D_KEY_PERIOD = 55,
 	QS2D_KEY_SLASH = 56,
@@ -169,7 +121,7 @@ enum
 	QS2D_KEY_PRINTSCREEN = 70,
 	QS2D_KEY_SCROLLLOCK = 71,
 	QS2D_KEY_PAUSE = 72,
-	QS2D_KEY_INSERT = 73, 
+	QS2D_KEY_INSERT = 73,
 	QS2D_KEY_HOME = 74,
 	QS2D_KEY_PAGEUP = 75,
 	QS2D_KEY_DELETE = 76,
@@ -179,7 +131,7 @@ enum
 	QS2D_KEY_LEFT = 80,
 	QS2D_KEY_DOWN = 81,
 	QS2D_KEY_UP = 82,
-	QS2D_KEY_NUMLOCKCLEAR = 83, 
+	QS2D_KEY_NUMLOCKCLEAR = 83,
 	QS2D_KEY_KP_DIVIDE = 84,
 	QS2D_KEY_KP_MULTIPLY = 85,
 	QS2D_KEY_KP_MINUS = 86,
@@ -196,8 +148,8 @@ enum
 	QS2D_KEY_KP_9 = 97,
 	QS2D_KEY_KP_0 = 98,
 	QS2D_KEY_KP_PERIOD = 99,
-	QS2D_KEY_NONUSBACKSLASH = 100, 
-	QS2D_KEY_APPLICATION = 101, 
+	QS2D_KEY_NONUSBACKSLASH = 100,
+	QS2D_KEY_APPLICATION = 101,
 	QS2D_KEY_POWER = 102,
 	QS2D_KEY_KP_EQUALS = 103,
 	QS2D_KEY_F13 = 104,
@@ -217,7 +169,7 @@ enum
 	QS2D_KEY_MENU = 118,
 	QS2D_KEY_SELECT = 119,
 	QS2D_KEY_STOP = 120,
-	QS2D_KEY_AGAIN = 121,  
+	QS2D_KEY_AGAIN = 121,
 	QS2D_KEY_UNDO = 122,
 	QS2D_KEY_CUT = 123,
 	QS2D_KEY_COPY = 124,
@@ -332,7 +284,7 @@ enum
 	QS2D_KEY_AC_BOOKMARKS = 274,
 	QS2D_KEY_BRIGHTNESSDOWN = 275,
 	QS2D_KEY_BRIGHTNESSUP = 276,
-	QS2D_KEY_DISPLAYSWITCH = 277, 
+	QS2D_KEY_DISPLAYSWITCH = 277,
 	QS2D_KEY_KBDILLUMTOGGLE = 278,
 	QS2D_KEY_KBDILLUMDOWN = 279,
 	QS2D_KEY_KBDILLUMUP = 280,
@@ -342,25 +294,12 @@ enum
 	QS2D_KEY_APP2 = 284,
 	QS2D_KEY_AUDIOREWIND = 285,
 	QS2D_KEY_AUDIOFASTFORWARD = 286,
-	QS2D_KEY_SCANCODES = 512, 
+	QS2D_KEY_SCANCODES = 512,
 };
-
-
-#endif // QS2D_INCLUDE_QS2D_H
-
-
-
-///////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////
-
-
-
+#endif
 #ifdef QS2D_IMPLEMENTATION
-
 #include <time.h>
 #include <stdlib.h>
-
 #ifndef _MSC_VER
 #ifdef __cplusplus
 #define QS2D_INLINE inline
@@ -370,39 +309,20 @@ enum
 #else
 #define QS2D_INLINE __forceinline
 #endif
-
-//////////////////////////////////
-/*
-	   Data
-				*/
-//////////////////////////////////
-
 static QS2D_Data *internal;
-
-///////////////////////////////////////
-/*
-	Functions
-				*/
-///////////////////////////////////////
-
 QS2D_INLINE void QS2D_Init(char* name, const int width, const int height)
 {
 	srand(time(NULL));
-	
-	//States
 	internal = (QS2D_Data*)malloc(sizeof(QS2D_Data));
 	internal->quit = 0;
 	internal->renderOnEvent = 1;
 	internal->w = width;
 	internal->h = height;
-
-	//Sdl
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
 	internal->window = SDL_CreateWindow(name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_RENDERER_PRESENTVSYNC);
 	internal->render = SDL_CreateRenderer(internal->window, -1, SDL_RENDERER_ACCELERATED);
 }
-
 QS2D_INLINE void QS2D_Close()
 {
 	SDL_DestroyWindow(internal->window);
@@ -410,12 +330,10 @@ QS2D_INLINE void QS2D_Close()
 	free(internal);
 	SDL_Quit();
 }
-
 QS2D_INLINE void QS2D_Render()
 {
 	SDL_RenderPresent(internal->render);
 }
-
 QS2D_INLINE int QS2D_Event()
 {
 	static SDL_Event event;
@@ -432,15 +350,14 @@ QS2D_INLINE int QS2D_Event()
 		case SDL_KEYUP:
 			internal->input.key[event.key.keysym.scancode] = 0;
 			break;
-		default: 
+		default:
 			break;
 		}
 	}
-	if(internal->renderOnEvent)
+	if (internal->renderOnEvent)
 		QS2D_Render();
 	return internal->quit;
 }
-
 QS2D_INLINE bool QS2D_Key(const int button)
 {
 	if (button < 512)
@@ -448,45 +365,33 @@ QS2D_INLINE bool QS2D_Key(const int button)
 		return internal->input.key[button];
 	}
 	return 0;
-
 }
 QS2D_INLINE void QS2D_Quit()
 {
 	internal->quit = 1;
 }
-
 QS2D_INLINE QS2D_Color QS2D_NewColor(const Uint8 r, const Uint8 g, const Uint8 b, const Uint8 a)
 {
 	QS2D_Color color = { r, g, b, a };
 	return color;
 }
-
 QS2D_INLINE void QS2D_SetColor(const QS2D_Color c)
 {
 	SDL_SetRenderDrawColor(internal->render, c.r, c.g, c.b, c.a);
 }
-
 QS2D_INLINE void QS2D_Clear()
 {
 	SDL_RenderClear(internal->render);
 }
-
 QS2D_INLINE void QS2D_Pixel(const int x, const int y)
 {
 	SDL_RenderDrawPoint(internal->render, x, y);
 }
-
 QS2D_INLINE QS2D_Color QS2D_GetPixel(const int x, const int y)
 {
-	/*
-	Uint32 pixel = 0;
-	SDL_Rect rect = { x, y, 1, 1 };
-	SDL_RenderReadPixels(internal->render, &rect, pixel, NULL, sizeof(Uint32)*internal->w);
-	printf("<%8x> hexadecimal padded with blanks to width 8.\n", pixel);*/
-	QS2D_Color c = {0};
+	QS2D_Color c = { 0 };
 	return c;
 }
-
 QS2D_INLINE void QS2D_ScreenShot(char* path_name)
 {
 	SDL_Surface *s = SDL_CreateRGBSurface(0, internal->w, internal->h, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
@@ -494,71 +399,29 @@ QS2D_INLINE void QS2D_ScreenShot(char* path_name)
 	SDL_SaveBMP(s, path_name);
 	SDL_FreeSurface(s);
 }
-
 QS2D_INLINE void QS2D_AutoRender()
 {
 	internal->renderOnEvent = 1;
 }
-
 QS2D_INLINE void QS2D_ManualRender()
 {
 	internal->renderOnEvent = 0;
 }
-
 QS2D_INLINE void QS2D_ResizeWin(const int w, const int h)
 {
 	SDL_SetWindowSize(internal->window, w, h);
 	internal->w = w; internal->h = h;
 }
-
 QS2D_INLINE int QS2D_GetWinW()
 {
 	int w;
 	SDL_GetWindowSize(internal->window, &w, NULL);
 	return w;
 }
-
 QS2D_INLINE int QS2D_GetWinH()
 {
 	int h;
 	SDL_GetWindowSize(internal->window, NULL, &h);
 	return h;
 }
-
-#endif // QS2D_IMPLEMENTATION
-
-
-///////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////
-
-
-
-///////////////////////////////////////
-/*
-	  Licence
-				*/
-///////////////////////////////////////
-
-/*
-<Licence MIT>
-
-Copyright © WARLUS Dylan
-
-Permission is hereby granted, free of charge, to any person obtaining a
-copy of this software and associated documentation files (the “Software”),
-to deal in the Software without restriction, including without limitation
-the rights to use, copy, modify, merge, publish, distribute, sublicense,
-and/or sell copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Software.
-
-The Software is provided “as is”, without warranty of any kind, express
-or implied, including but not limited to the warranties of merchantability,
-fitness for a particular purpose and noninfringement. In no event shall the
-authors or copyright holders be liable for any claim, damages or other liability,
-whether in an action of contract, tort or otherwise, arising from, out of
-or in connection with the software or the use or other dealings in the Software.
-*/
+#endif

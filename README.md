@@ -1,6 +1,13 @@
-Quick SDL2 Draw
+#Quick SDL2 Draw
 
-A basic drawing C/C++ header only library but need SDL2
+A basic drawing C/C++ header-only library.
+
+##Dependency
+
+Only SDL2
+
+##Example :
+Draw random pixel on screen with random color
 
 ```c
 #define QS2D_IMPLEMENTATION
@@ -20,4 +27,3 @@ int main()
 }
 ```
 
-Draw random pixel on screen with random color
