@@ -1,12 +1,12 @@
-#Quick SDL2 Draw
+# QS2D : Quick Sdl2 Draw
 
 A basic drawing C/C++ header-only library.
 
-##Dependency
+## Dependency
 
-Only SDL2
+    -SDL2
 
-##Example :
+## Example :
 Draw random pixel on screen with random color
 
 ```c
