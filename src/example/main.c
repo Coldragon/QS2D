@@ -20,7 +20,7 @@
 
 #if MAIN_EX == 1
 
-int main()
+int main(int argc, char ** argv)
 {
 	const int width = 800, height = 480;
 	QS2D_Init("Random pixel color", width, height);
@@ -29,8 +29,7 @@ int main()
 		for(int i = 0; i < width; i++)
 			for (int j = 0; j < height; j++)
 			{
-				QS2D_Color color = { rand() % 255, rand() % 255, rand() % 255 };
-				QS2D_Draw_ColorSet(color);
+				QS2D_Draw_ColorSet(QS2D_Color_New(rand() % 255, rand() % 255, rand() % 255 ));
 				QS2D_Draw_Pixel(i, j);
 			}
 
