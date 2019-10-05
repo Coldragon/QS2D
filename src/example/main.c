@@ -229,6 +229,7 @@ int main(int argc, char *argv[])
 {
 	QS2D_Init("Test", 800, 480);
 	QS2D_Screen_SetBGColor(QS2D_Color_New(50, 20, 10));
+
 	while (QS2D_Event())
 	{
 		if (QS2D_Key(QS2D_KEY_W))
