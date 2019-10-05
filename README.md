@@ -1,27 +1,33 @@
 # QS2D : Quick Sdl2 Draw
 
-A basic drawing C/C++ header-only library.
+A simple header-only library written in C to handle draw, input and window quick hover the SDL2.
 
 ## Dependency
 
-    -SDL2
+    -SDL2 - Only the 2.0.10 because it use the new float drawing function
 
 ## Example :
-Draw random pixel on screen with random color
+
+Fill screen with randomly colored Pixel.
 
 ```c
 #define QS2D_IMPLEMENTATION
-#include "hdr/qs2d.h"
+#include <qs2d.h>
 
 int main()
 {
-	QS2D_Init("Random Pixel and Color", 400, 400);
-	while (!QS2D_Event())
-	{
-		QS2D_Color color = { rand() % 255, rand() % 255, rand() % 255, 255 };
-		QS2D_SetColor(color);
-		QS2D_Pixel(rand() % 400, rand() % 400);
-	}
+	const int width = 800, height = 480;
+	QS2D_Init("Random pixel color", width, height);
+	
+	while (QS2D_Event())
+		for(int i = 0; i < width; i++)
+			for (int j = 0; j < height; j++)
+			{
+				QS2D_Color color = { rand() % 255, rand() % 255, rand() % 255 };
+				QS2D_Draw_ColorSet(color);
+				QS2D_Draw_Pixel(i, j);
+			}
+
 	QS2D_Close();
 	return 0;
 }
