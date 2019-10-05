@@ -11,7 +11,7 @@
 #define QS2D_INCLUDE_QS2D_H
 #include <SDL2/SDL.h>
 #include <stdbool.h>
-#define QS2D_VERSION "007"
+#define QS2D_VERSION "008"
 #ifdef QS2D_USE_STATIC
 #define QS2D_DEF static
 #else
@@ -38,6 +38,7 @@ typedef struct QS2D_Point { QS2D_Float x, y; } QS2D_Point;
 typedef struct QS2D_Rect { QS2D_Float x, y, w, h; } QS2D_Rect;
 QS2D_DEF void QS2D_Init(const char* name, const int width, const int height);
 QS2D_DEF void QS2D_Close();
+QS2D_DEF void QS2D_Log(const char* format, ...);
 QS2D_DEF void QS2D_Screen_Render();
 QS2D_DEF void QS2D_Screen_Clear();
 QS2D_DEF void QS2D_Screen_AutoRender();
@@ -317,6 +318,7 @@ enum
 #define QS2D_INLINE __forceinline
 #endif
 static QS2D_Data *internal;
+#include <stdio.h>
 QS2D_INLINE void QS2D_Init(const char* name, const int width, const int height)
 {
 	srand(time(NULL));
@@ -458,5 +460,12 @@ QS2D_INLINE int QS2D_Screen_GetHeight()
 	int h;
 	SDL_GetWindowSize(internal->window, NULL, &h);
 	return h;
+}
+QS2D_INLINE void QS2D_Log(const char* format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	vprintf(format, args);
+	va_end(args);
 }
 #endif
