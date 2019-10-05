@@ -4,7 +4,7 @@
  * Choose one with the preprocessor
  */
 
-#define MAIN_EX 3
+#define MAIN_EX 4
 
 /*
  * 1 - Random pixel on screen with random color
@@ -17,6 +17,7 @@
 #define QS2D_IMPLEMENTATION
 #include "../_qs2d.h"
 #include <string.h>
+#include <stdio.h>
 
 
 #if MAIN_EX == 1
@@ -27,8 +28,8 @@ int main()
 	while (!QS2D_Event())
 	{
 		QS2D_Color color = { rand() % 255, rand() % 255, rand() % 255, 255 };
-		QS2D_SetColor(color);
-		QS2D_Pixel(rand() % 400, rand() % 400);
+		QS2D_Draw_ColorSet(color);
+		QS2D_Draw_Pixel(rand() % 400, rand() % 400);
 	}
 	QS2D_Close();
 	return 0;
@@ -105,8 +106,8 @@ int main(){
 		{
 			float value = (PerlinPinPin(x, y, 20) + 1) * 0.5f * 255;
 			QS2D_Color c = {value, value, value, 255};
-			QS2D_SetColor(c);
-			QS2D_Pixel(x, y);
+			QS2D_Draw_ColorSet(c);
+			QS2D_Draw_Pixel(x, y);
 		}
 
 	while (!QS2D_Event()){}
@@ -190,16 +191,16 @@ int main(int argc, char *argv[]){
 		for (int y = 0; y < h; y++){
 			float value = (perlin2d(x, y, 0.02f, 5) + 1) * 0.5f * 255;
 			QS2D_Color c = { value, value, value, 255 };
-			QS2D_SetColor(c);
-			QS2D_Pixel(x, y);
+			QS2D_Draw_ColorSet(c);
+			QS2D_Draw_Pixel(x, y);
 		}
-		QS2D_Render();
+		QS2D_Screen_Render();
 	}
 		
 
 	while (!QS2D_Event()){
 		if(QS2D_Key(QS2D_KEY_RETURN)){
-			QS2D_ScreenShot("screen.bmp");
+			QS2D_Screen_Save("screen.bmp");
 		}
 		if(QS2D_Key(QS2D_KEY_SPACE)){
 			SEED = rand()%(rand()%200)*rand();
@@ -207,10 +208,10 @@ int main(int argc, char *argv[]){
 				for (int y = 0; y < h; y++){
 					float value = (perlin2d(x, y, 0.02f, 5) + 1) * 0.5f * 255;
 					QS2D_Color c = { value, value, value, 255 };
-					QS2D_SetColor(c);
-					QS2D_Pixel(x, y);
+					QS2D_Draw_ColorSet(c);
+					QS2D_Draw_Pixel(x, y);
 				}
-				QS2D_Render();
+				QS2D_Screen_Render();
 			}
 		}
 	}
@@ -224,12 +225,21 @@ int main(int argc, char *argv[]){
 
 #if MAIN_EX == 4
 
-int main(int argc, char *argv[]){
-	int w = 800, h = 480;
-	QS2D_Init("Test", w, h);
+int main(int argc, char *argv[])
+{
+	QS2D_Init("Test", 800, 480);
+	QS2D_Screen_SetBGColor(QS2D_Color_New(50, 20, 10));
+	while (QS2D_Event())
+	{
+		if (QS2D_Key(QS2D_KEY_W))
+			printf("Hello World");
 
-	while (!QS2D_Event()){
-		
+		if (QS2D_Key(QS2D_KEY_D))
+		{
+			QS2D_Draw_ColorSet(QS2D_Color_New(255,0,0));
+			QS2D_Draw_Rect(50, 50, 50, 50);
+		}
+			
 	}
 
 	QS2D_Close();

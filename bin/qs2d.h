@@ -11,7 +11,7 @@
 #define QS2D_INCLUDE_QS2D_H
 #include <SDL2/SDL.h>
 #include <stdbool.h>
-#define QS2D_VERSION "005"
+#define QS2D_VERSION "007"
 #ifdef QS2D_USE_STATIC
 #define QS2D_DEF static
 #else
@@ -22,33 +22,40 @@
 #else
 #define QS2D_Float float
 #endif
-typedef struct QS2D_Color { Uint8 r, g, b, a; } QS2D_Color;
+typedef struct QS2D_Color { Uint8 r, g, b; } QS2D_Color;
 typedef struct QS2D_Input { bool key[512]; } QS2D_Input;
 typedef struct QS2D_Data {
 	SDL_Window *window;
 	SDL_Renderer *render;
+	QS2D_Color background_color;
 	QS2D_Input input;
 	bool quit;
-	bool renderOnEvent; int w, h;
+	bool autoRender; 
+	bool autoClear;
+	int w, h;
 } QS2D_Data;
 typedef struct QS2D_Point { QS2D_Float x, y; } QS2D_Point;
-QS2D_DEF void QS2D_Init(char* name, const int width, const int height);
+typedef struct QS2D_Rect { QS2D_Float x, y, w, h; } QS2D_Rect;
+QS2D_DEF void QS2D_Init(const char* name, const int width, const int height);
 QS2D_DEF void QS2D_Close();
-QS2D_DEF void QS2D_Render();
-QS2D_DEF void QS2D_Clear();
-QS2D_DEF void QS2D_AutoRender();
-QS2D_DEF void QS2D_ManualRender();
+QS2D_DEF void QS2D_Screen_Render();
+QS2D_DEF void QS2D_Screen_Clear();
+QS2D_DEF void QS2D_Screen_AutoRender();
+QS2D_DEF void QS2D_Screen_ManualRender();
 QS2D_DEF int QS2D_Event();
 QS2D_DEF void QS2D_Quit();
 QS2D_DEF bool QS2D_Key(int button);
-QS2D_DEF QS2D_Color QS2D_NewColor(const Uint8 r, const Uint8 g, const Uint8 b, const Uint8 a);
-QS2D_DEF void QS2D_SetColor(QS2D_Color c);
-QS2D_DEF void QS2D_Pixel(int x, int y);
-QS2D_DEF void QS2D_ScreenShot(char* path_name);
-QS2D_DEF void QS2D_ResizeWin(int w, int h);
-QS2D_DEF int QS2D_GetWinW();
-QS2D_DEF int QS2D_GetWinH();
-QS2D_DEF QS2D_Color QS2D_GetPixel(int x, int y);
+QS2D_DEF QS2D_Color QS2D_Color_New(const Uint8 r, const Uint8 g, const Uint8 b);
+QS2D_DEF void QS2D_Draw_ColorSet(QS2D_Color c);
+QS2D_DEF void QS2D_Draw_Pixel(const float x, const float y);
+QS2D_DEF void QS2D_Draw_Rect(const float x, const float y, const float w, const float h);
+QS2D_DEF void QS2D_Screen_SetBGColor(QS2D_Color c);
+QS2D_DEF QS2D_Color QS2D_Screen_GetBGColor();
+QS2D_DEF void QS2D_Screen_Resize(int w, int h);
+QS2D_DEF int QS2D_Screen_GetWidth();
+QS2D_DEF int QS2D_Screen_GetHeight();
+QS2D_DEF void QS2D_Screen_Save(const char* path_name);
+QS2D_DEF QS2D_Color QS2D_Screen_GetPixel(int x, int y);
 enum
 {
 	QS2D_KEY_UNKNOWN = 0,
@@ -310,12 +317,16 @@ enum
 #define QS2D_INLINE __forceinline
 #endif
 static QS2D_Data *internal;
-QS2D_INLINE void QS2D_Init(char* name, const int width, const int height)
+QS2D_INLINE void QS2D_Init(const char* name, const int width, const int height)
 {
 	srand(time(NULL));
-	internal = (QS2D_Data*)malloc(sizeof(QS2D_Data));
+	internal = (QS2D_Data*)calloc(1, sizeof(QS2D_Data));
+	if (internal == NULL)
+		exit(1);
+	internal->background_color = QS2D_Color_New(0, 0, 0);
 	internal->quit = 0;
-	internal->renderOnEvent = 1;
+	internal->autoRender = 1;
+	internal->autoClear = 1;
 	internal->w = width;
 	internal->h = height;
 	SDL_Init(SDL_INIT_VIDEO);
@@ -330,7 +341,7 @@ QS2D_INLINE void QS2D_Close()
 	free(internal);
 	SDL_Quit();
 }
-QS2D_INLINE void QS2D_Render()
+QS2D_INLINE void QS2D_Screen_Render()
 {
 	SDL_RenderPresent(internal->render);
 }
@@ -354,9 +365,11 @@ QS2D_INLINE int QS2D_Event()
 			break;
 		}
 	}
-	if (internal->renderOnEvent)
-		QS2D_Render();
-	return internal->quit;
+	if (internal->autoRender)
+		QS2D_Screen_Render();
+	if (internal->autoClear)
+		QS2D_Screen_Clear();		
+	return !internal->quit;
 }
 QS2D_INLINE bool QS2D_Key(const int button)
 {
@@ -370,55 +383,77 @@ QS2D_INLINE void QS2D_Quit()
 {
 	internal->quit = 1;
 }
-QS2D_INLINE QS2D_Color QS2D_NewColor(const Uint8 r, const Uint8 g, const Uint8 b, const Uint8 a)
+QS2D_INLINE QS2D_Color QS2D_Color_New(const Uint8 r, const Uint8 g, const Uint8 b)
 {
-	QS2D_Color color = { r, g, b, a };
+	const QS2D_Color color = { r, g, b};
 	return color;
 }
-QS2D_INLINE void QS2D_SetColor(const QS2D_Color c)
+QS2D_INLINE void QS2D_Draw_ColorSet(const QS2D_Color c)
 {
-	SDL_SetRenderDrawColor(internal->render, c.r, c.g, c.b, c.a);
+	SDL_SetRenderDrawColor(internal->render, c.r, c.g, c.b, 255);
 }
-QS2D_INLINE void QS2D_Clear()
+QS2D_INLINE void QS2D_Screen_Clear()
 {
+	SDL_SetRenderDrawColor(internal->render, internal->background_color.r, internal->background_color.g, internal->background_color.b, 255);
 	SDL_RenderClear(internal->render);
 }
-QS2D_INLINE void QS2D_Pixel(const int x, const int y)
+QS2D_INLINE void QS2D_Draw_Pixel(const float x, const float y)
 {
-	SDL_RenderDrawPoint(internal->render, x, y);
+	SDL_RenderDrawPointF(internal->render, x, y);
 }
-QS2D_INLINE QS2D_Color QS2D_GetPixel(const int x, const int y)
+QS2D_INLINE void QS2D_Draw_Rect(const float x, const float y, const float w, const float h)
+{
+	SDL_FRect rect = { x,y,w,h };
+	SDL_RenderDrawRectF(internal->render, &rect);
+}
+QS2D_INLINE QS2D_Color QS2D_Screen_GetPixel(const int x, const int y)
 {
 	QS2D_Color c = { 0 };
 	return c;
 }
-QS2D_INLINE void QS2D_ScreenShot(char* path_name)
+QS2D_INLINE void QS2D_Screen_SetBGColor(QS2D_Color c)
+{
+	internal->background_color = c;
+}
+QS2D_INLINE QS2D_Color QS2D_Screen_GetBGColor()
+{
+	return internal->background_color;
+}
+QS2D_INLINE void QS2D_Screen_Save(const char* path_name)
 {
 	SDL_Surface *s = SDL_CreateRGBSurface(0, internal->w, internal->h, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
 	SDL_RenderReadPixels(internal->render, NULL, SDL_PIXELFORMAT_ARGB8888, s->pixels, s->pitch);
 	SDL_SaveBMP(s, path_name);
 	SDL_FreeSurface(s);
 }
-QS2D_INLINE void QS2D_AutoRender()
+QS2D_INLINE void QS2D_Screen_AutoRender()
 {
-	internal->renderOnEvent = 1;
+	internal->autoRender = 1;
 }
-QS2D_INLINE void QS2D_ManualRender()
+QS2D_INLINE void QS2D_Screen_ManualRender()
 {
-	internal->renderOnEvent = 0;
+	internal->autoRender = 0;
 }
-QS2D_INLINE void QS2D_ResizeWin(const int w, const int h)
+QS2D_INLINE void QS2D_Screen_AutoClear()
+{
+	internal->autoClear = 1;
+}
+QS2D_INLINE void QS2D_Screen_ManualClear()
+{
+	internal->autoClear = 0;
+}
+QS2D_INLINE void QS2D_Screen_Resize(const int w, const int h)
 {
 	SDL_SetWindowSize(internal->window, w, h);
 	internal->w = w; internal->h = h;
 }
-QS2D_INLINE int QS2D_GetWinW()
+QS2D_INLINE int QS2D_Screen_GetWidth()
 {
 	int w;
 	SDL_GetWindowSize(internal->window, &w, NULL);
 	return w;
 }
-QS2D_INLINE int QS2D_GetWinH()
+QS2D_INLINE int QS2D_Screen_GetHeight()
 {
 	int h;
 	SDL_GetWindowSize(internal->window, NULL, &h);
