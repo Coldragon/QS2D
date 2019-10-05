@@ -9,6 +9,7 @@ Prototypes
 /* init */
 QS2D_DEF void QS2D_Init(const char* name, const int width, const int height);
 QS2D_DEF void QS2D_Close();
+QS2D_DEF void QS2D_Log(const char* format, ...);
 
 /* rendering */
 QS2D_DEF void QS2D_Screen_Render();

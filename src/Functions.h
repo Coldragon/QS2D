@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <stdio.h>
 
 ///////////////////////////////////////
 /*
@@ -179,4 +180,12 @@ QS2D_INLINE int QS2D_Screen_GetHeight()
 	int h;
 	SDL_GetWindowSize(internal->window, NULL, &h);
 	return h;
+}
+
+QS2D_INLINE void QS2D_Log(const char* format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	vprintf(format, args);
+	va_end(args);
 }
