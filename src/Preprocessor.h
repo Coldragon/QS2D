@@ -6,7 +6,7 @@ Preproc
 */
 //////////////////////////////////
 
-#define QS2D_VERSION "009"
+#define QS2D_VERSION "010"
 
 #ifdef QS2D_USE_STATIC
 #define QS2D_DEF static

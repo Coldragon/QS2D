@@ -157,6 +157,11 @@ QS2D_INLINE void QS2D_Draw_Rect(const float x, const float y, const float w, con
 	SDL_RenderDrawRectF(internal->render, &rect);
 }
 
+QS2D_INLINE void QS2D_Draw_Line(const float x1, const float y1, const float x2, const float y2)
+{
+	SDL_RenderDrawLineF(internal->render, x1, y1, x2, y2);
+}
+
 QS2D_INLINE QS2D_Color QS2D_Screen_GetPixel(const int x, const int y)
 {
 	//TODO 
@@ -164,7 +169,8 @@ QS2D_INLINE QS2D_Color QS2D_Screen_GetPixel(const int x, const int y)
 	Uint32 pixel = 0;
 	SDL_Rect rect = { x, y, 1, 1 };
 	SDL_RenderReadPixels(internal->render, &rect, pixel, NULL, sizeof(Uint32)*internal->w);
-	printf("<%8x> hexadecimal padded with blanks to width 8.\n", pixel);*/
+	printf("<%8x> hexadecimal padded with blanks to width 8.\n", pixel);
+	*/
 	QS2D_Color c = { 0 };
 	return c;
 }
