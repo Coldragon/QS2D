@@ -20,7 +20,7 @@ QS2D_DEF void QS2D_Screen_ManualRender();
 /* event */
 QS2D_DEF int QS2D_Event();
 QS2D_DEF void QS2D_Quit();
-QS2D_DEF bool QS2D_Key(int button);
+QS2D_DEF bool QS2D_Key_IsPressing(int button);
 
 /* drawing */
 QS2D_DEF QS2D_Color QS2D_Color_New(const Uint8 r, const Uint8 g, const Uint8 b);

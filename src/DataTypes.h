@@ -7,7 +7,7 @@ Typedef
 //////////////////////////////////
 
 typedef struct QS2D_Color { Uint8 r, g, b; } QS2D_Color;
-typedef struct QS2D_Input { bool key[512]; } QS2D_Input;
+typedef struct QS2D_Input { bool is_pressing[512]; bool on_release[512]; bool on_press[512]; } QS2D_Input;
 typedef struct QS2D_Data {
 	SDL_Window *window;
 	SDL_Renderer *render;

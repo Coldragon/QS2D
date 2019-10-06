@@ -22,16 +22,32 @@
 
 int main(int argc, char ** argv)
 {
-	const int width = 800, height = 480;
+	const int width = 400, height = 400;
 	QS2D_Init("Random pixel color", width, height);
 	
 	while (QS2D_Event())
-		for(int i = 0; i < width; i++)
+	{
+		if (QS2D_Key_OnPress(QS2D_KEY_Z))
+		{
+			printf("OnPress\n");
+		}
+		if (QS2D_Key_IsPressing(QS2D_KEY_Z))
+		{
+			printf("IsPressing\n");
+		}
+		if (QS2D_Key_OnRelease(QS2D_KEY_Z))
+		{
+			printf("OnRelease\n");
+		}
+
+		for (int i = 0; i < width; i++)
 			for (int j = 0; j < height; j++)
 			{
-				QS2D_Draw_ColorSet(QS2D_Color_New(rand() % 255, rand() % 255, rand() % 255 ));
+				QS2D_Draw_ColorSet(QS2D_Color_New(rand() % 255, rand() % 255, rand() % 255));
 				QS2D_Draw_Pixel(i, j);
 			}
+	}
+		
 
 	QS2D_Close();
 	return 0;
@@ -201,10 +217,10 @@ int main(int argc, char *argv[]){
 		
 
 	while (!QS2D_Event()){
-		if(QS2D_Key(QS2D_KEY_RETURN)){
+		if(QS2D_Key_IsPressing(QS2D_KEY_RETURN)){
 			QS2D_Screen_Save("screen.bmp");
 		}
-		if(QS2D_Key(QS2D_KEY_SPACE)){
+		if(QS2D_Key_IsPressing(QS2D_KEY_SPACE)){
 			SEED = rand()%(rand()%200)*rand();
 			for (int x = 0; x < w; x++){
 				for (int y = 0; y < h; y++){
@@ -234,10 +250,10 @@ int main(int argc, char *argv[])
 
 	while (QS2D_Event())
 	{
-		if (QS2D_Key(QS2D_KEY_W))
+		if (QS2D_Key_IsPressing(QS2D_KEY_W))
 			printf("Hello World");
 
-		if (QS2D_Key(QS2D_KEY_D))
+		if (QS2D_Key_IsPressing(QS2D_KEY_D))
 		{
 			QS2D_Draw_ColorSet(QS2D_Color_New(255,0,0));
 			QS2D_Draw_Rect(50, 50, 50, 50);

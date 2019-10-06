@@ -46,6 +46,13 @@ QS2D_INLINE void QS2D_Screen_Render()
 QS2D_INLINE int QS2D_Event()
 {
 	static SDL_Event event;
+
+	for (int i = 0; i < 512; i++)
+	{
+		internal->input.on_press[i] = 0;
+		internal->input.on_release[i] = 0;
+	}
+	
 	while (SDL_PollEvent(&event))
 	{
 		switch (event.type)
@@ -54,10 +61,20 @@ QS2D_INLINE int QS2D_Event()
 			internal->quit = 1;
 			break;
 		case SDL_KEYDOWN:
-			internal->input.key[event.key.keysym.scancode] = 1;
+			//internal->input.is_pressing[event.key.keysym.scancode] = 1;
+			if (internal->input.is_pressing[event.key.keysym.scancode] == 0)
+			{
+				internal->input.is_pressing[event.key.keysym.scancode] = 1;
+				internal->input.on_press[event.key.keysym.scancode] = 1;
+			}
 			break;
 		case SDL_KEYUP:
-			internal->input.key[event.key.keysym.scancode] = 0;
+			//internal->input.is_pressing[event.key.keysym.scancode] = 0;
+			if (internal->input.is_pressing[event.key.keysym.scancode] == 1)
+			{
+				internal->input.is_pressing[event.key.keysym.scancode] = 0;
+				internal->input.on_release[event.key.keysym.scancode] = 1;
+			}
 			break;
 		default:
 			break;
@@ -72,15 +89,33 @@ QS2D_INLINE int QS2D_Event()
 	return !internal->quit;
 }
 
-QS2D_INLINE bool QS2D_Key(const int button)
+QS2D_INLINE bool QS2D_Key_IsPressing(const int button)
 {
 	if (button < 512)
 	{
-		return internal->input.key[button];
+		return internal->input.is_pressing[button];
 	}
 	return 0;
-
 }
+
+QS2D_INLINE bool QS2D_Key_OnRelease(const int button)
+{
+	if (button < 512)
+	{
+		return internal->input.on_release[button];
+	}
+	return 0;
+}
+
+QS2D_INLINE bool QS2D_Key_OnPress(const int button)
+{
+	if (button < 512)
+	{
+		return internal->input.on_press[button];
+	}
+	return 0;
+}
+
 QS2D_INLINE void QS2D_Quit()
 {
 	internal->quit = 1;
