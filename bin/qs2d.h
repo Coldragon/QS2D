@@ -63,6 +63,7 @@ QS2D_DEF QS2D_Color QS2D_Color_New(const Uint8 r, const Uint8 g, const Uint8 b);
 QS2D_DEF void QS2D_Draw_ColorSet(QS2D_Color c);
 QS2D_DEF void QS2D_Draw_Pixel(const float x, const float y);
 QS2D_DEF void QS2D_Draw_Rect(const float x, const float y, const float w, const float h);
+QS2D_DEF void QS2D_Draw_FilledRect(const float x, const float y, const float w, const float h);
 QS2D_DEF void QS2D_Draw_Line(const float x1, const float y1, const float x2, const float y2);
 QS2D_DEF void QS2D_Screen_SetBGColor(QS2D_Color c);
 QS2D_DEF QS2D_Color QS2D_Screen_GetBGColor();
@@ -457,6 +458,11 @@ QS2D_INLINE void QS2D_Draw_Rect(const float x, const float y, const float w, con
 {
 	SDL_FRect rect = { x,y,w,h };
 	SDL_RenderDrawRectF(internal->render, &rect);
+}
+QS2D_INLINE void QS2D_Draw_FilledRect(const float x, const float y, const float w, const float h)
+{
+	SDL_FRect rect = { x,y,w,h };
+	SDL_RenderFillRectF(internal->render, &rect);
 }
 QS2D_INLINE void QS2D_Draw_Line(const float x1, const float y1, const float x2, const float y2)
 {

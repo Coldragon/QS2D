@@ -156,7 +156,11 @@ QS2D_INLINE void QS2D_Draw_Rect(const float x, const float y, const float w, con
 	SDL_FRect rect = { x,y,w,h };
 	SDL_RenderDrawRectF(internal->render, &rect);
 }
-
+QS2D_INLINE void QS2D_Draw_FilledRect(const float x, const float y, const float w, const float h)
+{
+	SDL_FRect rect = { x,y,w,h };
+	SDL_RenderFillRectF(internal->render, &rect);
+}
 QS2D_INLINE void QS2D_Draw_Line(const float x1, const float y1, const float x2, const float y2)
 {
 	SDL_RenderDrawLineF(internal->render, x1, y1, x2, y2);
