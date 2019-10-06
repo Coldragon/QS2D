@@ -1,17 +1,30 @@
 ///////////////////////////////////////////////////////////////////////
-///////////                Quick SDL2 Drawer              /////////////
+///////////            QS2D : Quick SDL2 Drawer           /////////////
 ///////////////////////////////////////////////////////////////////////
 /* 
- * Simple and quick layer for SDL2 to show a window and draw pixel on it.
- * 
- * 
- * Licence at the end of the file
+MIT License
+Copyright(c) 2019 WARLUS Dylan
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files(the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and /or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions :
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 */
 #ifndef QS2D_INCLUDE_QS2D_H
 #define QS2D_INCLUDE_QS2D_H
 #include <SDL2/SDL.h>
 #include <stdbool.h>
-#define QS2D_VERSION "008"
+#define QS2D_VERSION "009"
 #ifdef QS2D_USE_STATIC
 #define QS2D_DEF static
 #else
@@ -23,7 +36,7 @@
 #define QS2D_Float float
 #endif
 typedef struct QS2D_Color { Uint8 r, g, b; } QS2D_Color;
-typedef struct QS2D_Input { bool key[512]; } QS2D_Input;
+typedef struct QS2D_Input { bool is_pressing[512]; bool on_release[512]; bool on_press[512]; } QS2D_Input;
 typedef struct QS2D_Data {
 	SDL_Window *window;
 	SDL_Renderer *render;
@@ -43,9 +56,9 @@ QS2D_DEF void QS2D_Screen_Render();
 QS2D_DEF void QS2D_Screen_Clear();
 QS2D_DEF void QS2D_Screen_AutoRender();
 QS2D_DEF void QS2D_Screen_ManualRender();
-QS2D_DEF int QS2D_Event();
+QS2D_DEF int QS2D_Input_Handle();
 QS2D_DEF void QS2D_Quit();
-QS2D_DEF bool QS2D_Key(int button);
+QS2D_DEF bool QS2D_Key_IsPressing(int button);
 QS2D_DEF QS2D_Color QS2D_Color_New(const Uint8 r, const Uint8 g, const Uint8 b);
 QS2D_DEF void QS2D_Draw_ColorSet(QS2D_Color c);
 QS2D_DEF void QS2D_Draw_Pixel(const float x, const float y);
@@ -331,7 +344,7 @@ QS2D_INLINE void QS2D_Init(const char* name, const int width, const int height)
 	internal->autoClear = 1;
 	internal->w = width;
 	internal->h = height;
-	SDL_Init(SDL_INIT_VIDEO);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
 	internal->window = SDL_CreateWindow(name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_RENDERER_PRESENTVSYNC);
 	internal->render = SDL_CreateRenderer(internal->window, -1, SDL_RENDERER_ACCELERATED);
@@ -343,13 +356,25 @@ QS2D_INLINE void QS2D_Close()
 	free(internal);
 	SDL_Quit();
 }
+QS2D_INLINE void QS2D_Log(const char* format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	vprintf(format, args);
+	va_end(args);
+}
 QS2D_INLINE void QS2D_Screen_Render()
 {
 	SDL_RenderPresent(internal->render);
 }
-QS2D_INLINE int QS2D_Event()
+QS2D_INLINE int QS2D_Input_Handle()
 {
 	static SDL_Event event;
+	for (int i = 0; i < 512; i++)
+	{
+		internal->input.on_press[i] = 0;
+		internal->input.on_release[i] = 0;
+	}
 	while (SDL_PollEvent(&event))
 	{
 		switch (event.type)
@@ -358,10 +383,18 @@ QS2D_INLINE int QS2D_Event()
 			internal->quit = 1;
 			break;
 		case SDL_KEYDOWN:
-			internal->input.key[event.key.keysym.scancode] = 1;
+			if (internal->input.is_pressing[event.key.keysym.scancode] == 0)
+			{
+				internal->input.is_pressing[event.key.keysym.scancode] = 1;
+				internal->input.on_press[event.key.keysym.scancode] = 1;
+			}
 			break;
 		case SDL_KEYUP:
-			internal->input.key[event.key.keysym.scancode] = 0;
+			if (internal->input.is_pressing[event.key.keysym.scancode] == 1)
+			{
+				internal->input.is_pressing[event.key.keysym.scancode] = 0;
+				internal->input.on_release[event.key.keysym.scancode] = 1;
+			}
 			break;
 		default:
 			break;
@@ -373,11 +406,27 @@ QS2D_INLINE int QS2D_Event()
 		QS2D_Screen_Clear();		
 	return !internal->quit;
 }
-QS2D_INLINE bool QS2D_Key(const int button)
+QS2D_INLINE bool QS2D_Key_IsPressing(const int button)
 {
 	if (button < 512)
 	{
-		return internal->input.key[button];
+		return internal->input.is_pressing[button];
+	}
+	return 0;
+}
+QS2D_INLINE bool QS2D_Key_OnRelease(const int button)
+{
+	if (button < 512)
+	{
+		return internal->input.on_release[button];
+	}
+	return 0;
+}
+QS2D_INLINE bool QS2D_Key_OnPress(const int button)
+{
+	if (button < 512)
+	{
+		return internal->input.on_press[button];
 	}
 	return 0;
 }
@@ -460,12 +509,5 @@ QS2D_INLINE int QS2D_Screen_GetHeight()
 	int h;
 	SDL_GetWindowSize(internal->window, NULL, &h);
 	return h;
-}
-QS2D_INLINE void QS2D_Log(const char* format, ...)
-{
-	va_list args;
-	va_start(args, format);
-	vprintf(format, args);
-	va_end(args);
 }
 #endif

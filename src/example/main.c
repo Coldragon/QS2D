@@ -25,7 +25,7 @@ int main(int argc, char ** argv)
 	const int width = 400, height = 400;
 	QS2D_Init("Random pixel color", width, height);
 	
-	while (QS2D_Event())
+	while (QS2D_Input_Handle())
 	{
 		if (QS2D_Key_OnPress(QS2D_KEY_Z))
 		{
@@ -128,7 +128,7 @@ int main(){
 			QS2D_Draw_Pixel(x, y);
 		}
 
-	while (!QS2D_Event()){}
+	while (!QS2D_Input_Handle()){}
 
 	QS2D_Close();
 	return 0;
@@ -216,7 +216,7 @@ int main(int argc, char *argv[]){
 	}
 		
 
-	while (!QS2D_Event()){
+	while (!QS2D_Input_Handle()){
 		if(QS2D_Key_IsPressing(QS2D_KEY_RETURN)){
 			QS2D_Screen_Save("screen.bmp");
 		}
@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
 	QS2D_Init("Test", 800, 480);
 	QS2D_Screen_SetBGColor(QS2D_Color_New(50, 20, 10));
 
-	while (QS2D_Event())
+	while (QS2D_Input_Handle())
 	{
 		if (QS2D_Key_IsPressing(QS2D_KEY_W))
 			printf("Hello World");

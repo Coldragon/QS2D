@@ -24,7 +24,7 @@ QS2D_INLINE void QS2D_Init(const char* name, const int width, const int height)
 	internal->h = height;
 
 	// SDL INIT
-	SDL_Init(SDL_INIT_VIDEO);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
 	internal->window = SDL_CreateWindow(name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_RENDERER_PRESENTVSYNC);
 	internal->render = SDL_CreateRenderer(internal->window, -1, SDL_RENDERER_ACCELERATED);
@@ -38,12 +38,20 @@ QS2D_INLINE void QS2D_Close()
 	SDL_Quit();
 }
 
+QS2D_INLINE void QS2D_Log(const char* format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	vprintf(format, args);
+	va_end(args);
+}
+
 QS2D_INLINE void QS2D_Screen_Render()
 {
 	SDL_RenderPresent(internal->render);
 }
 
-QS2D_INLINE int QS2D_Event()
+QS2D_INLINE int QS2D_Input_Handle()
 {
 	static SDL_Event event;
 
@@ -215,12 +223,4 @@ QS2D_INLINE int QS2D_Screen_GetHeight()
 	int h;
 	SDL_GetWindowSize(internal->window, NULL, &h);
 	return h;
-}
-
-QS2D_INLINE void QS2D_Log(const char* format, ...)
-{
-	va_list args;
-	va_start(args, format);
-	vprintf(format, args);
-	va_end(args);
 }

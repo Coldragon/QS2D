@@ -18,7 +18,7 @@ QS2D_DEF void QS2D_Screen_AutoRender();
 QS2D_DEF void QS2D_Screen_ManualRender();
 
 /* event */
-QS2D_DEF int QS2D_Event();
+QS2D_DEF int QS2D_Input_Handle();
 QS2D_DEF void QS2D_Quit();
 QS2D_DEF bool QS2D_Key_IsPressing(int button);
 
