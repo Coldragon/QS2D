@@ -20,3 +20,4 @@ typedef struct QS2D_Data {
 } QS2D_Data;
 typedef struct QS2D_Point { QS2D_Float x, y; } QS2D_Point;
 typedef struct QS2D_Rect { QS2D_Float x, y, w, h; } QS2D_Rect;
+typedef struct QS2D_Image { int w, h; SDL_Texture* handle; } QS2D_Image;

@@ -35,6 +35,7 @@ QS2D_DEF void QS2D_Draw_Pixel(const float x, const float y);
 QS2D_DEF void QS2D_Draw_Rect(const float x, const float y, const float w, const float h);
 QS2D_DEF void QS2D_Draw_FilledRect(const float x, const float y, const float w, const float h);
 QS2D_DEF void QS2D_Draw_Line(const float x1, const float y1, const float x2, const float y2);
+QS2D_DEF void QS2D_Draw_Image(QS2D_Image* image, const float x, const float y, const float scale_w, const float scale_h, const float degree_rotation);
 
 /* screen */
 QS2D_DEF void QS2D_Screen_SetBGColor(QS2D_Color c);
@@ -43,3 +44,6 @@ QS2D_DEF void QS2D_Screen_Resize(int w, int h);
 QS2D_DEF int QS2D_Screen_GetWidth();
 QS2D_DEF int QS2D_Screen_GetHeight();
 QS2D_DEF void QS2D_Screen_Save(const char* path_name);
+
+/* image */
+QS2D_DEF QS2D_Image QS2D_Image_Load(const char* path);

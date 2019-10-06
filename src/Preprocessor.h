@@ -19,3 +19,7 @@ Preproc
 #else
 #define QS2D_Float float
 #endif
+
+#ifdef QS2D_INCLUDE_STBIMAGE
+#include QS2D_INCLUDE_STBIMAGE
+#endif

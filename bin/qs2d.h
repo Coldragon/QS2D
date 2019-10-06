@@ -35,6 +35,9 @@ SOFTWARE.
 #else
 #define QS2D_Float float
 #endif
+#ifdef QS2D_INCLUDE_STBIMAGE
+#include QS2D_INCLUDE_STBIMAGE
+#endif
 typedef struct QS2D_Color { Uint8 r, g, b; } QS2D_Color;
 typedef struct QS2D_Input { bool is_pressing[512]; bool on_release[512]; bool on_press[512]; } QS2D_Input;
 typedef struct QS2D_Data {
@@ -49,6 +52,7 @@ typedef struct QS2D_Data {
 } QS2D_Data;
 typedef struct QS2D_Point { QS2D_Float x, y; } QS2D_Point;
 typedef struct QS2D_Rect { QS2D_Float x, y, w, h; } QS2D_Rect;
+typedef struct QS2D_Image { QS2D_Float w, h; SDL_Texture* handle; } QS2D_Image;
 QS2D_DEF void QS2D_Init(const char* name, const int width, const int height);
 QS2D_DEF void QS2D_Close();
 QS2D_DEF void QS2D_Log(const char* format, ...);
@@ -69,12 +73,14 @@ QS2D_DEF void QS2D_Draw_Pixel(const float x, const float y);
 QS2D_DEF void QS2D_Draw_Rect(const float x, const float y, const float w, const float h);
 QS2D_DEF void QS2D_Draw_FilledRect(const float x, const float y, const float w, const float h);
 QS2D_DEF void QS2D_Draw_Line(const float x1, const float y1, const float x2, const float y2);
+QS2D_DEF void QS2D_Draw_Image(QS2D_Image* image, const float x, const float y, float scale_w, float scale_h, const float degree_rotation);
 QS2D_DEF void QS2D_Screen_SetBGColor(QS2D_Color c);
 QS2D_DEF QS2D_Color QS2D_Screen_GetBGColor();
 QS2D_DEF void QS2D_Screen_Resize(int w, int h);
 QS2D_DEF int QS2D_Screen_GetWidth();
 QS2D_DEF int QS2D_Screen_GetHeight();
 QS2D_DEF void QS2D_Screen_Save(const char* path_name);
+QS2D_DEF QS2D_Image QS2D_Image_Load(const char* path);
 enum
 {
 	QS2D_KEY_UNKNOWN = 0,QS2D_KEY_A = 4,QS2D_KEY_B = 5, QS2D_KEY_C = 6,
@@ -154,6 +160,12 @@ enum
 #endif
 static QS2D_Data *internal;
 #include <stdio.h>
+#ifdef QS2D_INCLUDE_STBIMAGE
+#define STB_IMAGE_IMPLEMENTATION
+#include QS2D_INCLUDE_STBIMAGE
+#endif
+#include <string.h>
+#include <ctype.h>
 QS2D_INLINE void QS2D_Init(const char* name, const int width, const int height)
 {
 	srand(time(NULL));
@@ -304,6 +316,13 @@ QS2D_INLINE void QS2D_Draw_Line(const float x1, const float y1, const float x2, 
 {
 	SDL_RenderDrawLineF(internal->render, x1, y1, x2, y2);
 }
+QS2D_INLINE void QS2D_Draw_Image(QS2D_Image * image, const float x, const float y, float scale_w, float scale_h, const float degree_rotation)
+{
+	scale_h = scale_h == 0 ? 1 : scale_h;
+	scale_w = scale_w == 0 ? 1 : scale_w;
+	SDL_FRect my_rect = { x, y, image->w * scale_w, image->h * scale_h };
+	SDL_RenderCopyExF(internal->render, image->handle, NULL, &my_rect, degree_rotation, NULL, SDL_FLIP_NONE);
+}
 QS2D_INLINE void QS2D_Screen_SetBGColor(QS2D_Color c)
 {
 	internal->background_color = c;
@@ -335,5 +354,95 @@ QS2D_INLINE void QS2D_Screen_Save(const char* path_name)
 	SDL_RenderReadPixels(internal->render, NULL, SDL_PIXELFORMAT_ARGB8888, s->pixels, s->pitch);
 	SDL_SaveBMP(s, path_name);
 	SDL_FreeSurface(s);
+}
+QS2D_INLINE char * GetExtension(const char * string_)
+{
+	char * ex = strrchr(string_, '.');
+	if (!ex || ex == string_)
+	{
+		return "";
+	}
+	return ex+1;
+}
+QS2D_INLINE int strcicmp(char const* a, char const* b)
+{
+	for (;; a++, b++) {
+		int d = tolower((unsigned char)* a) - tolower((unsigned char)* b);
+		if (d != 0 || !*a)
+			return d;
+	}
+}
+QS2D_INLINE QS2D_Image QS2D_Image_Load(const char * path)
+{
+	Uint32 rmask, gmask, bmask, amask;
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	rmask = 0xff000000;
+	gmask = 0x00ff0000;
+	bmask = 0x0000ff00;
+	amask = 0x000000ff;
+#else
+	rmask = 0x000000ff;
+	gmask = 0x0000ff00;
+	bmask = 0x00ff0000;
+	amask = 0xff000000;
+#endif
+	char * extension = GetExtension(path);
+	if(strcicmp(extension, "BMP"))
+	{
+		QS2D_Image image = { 0 };
+		SDL_Surface* surf = SDL_LoadBMP(path);
+		image.handle = SDL_CreateTextureFromSurface(internal->render, surf);
+		image.w = surf->w; image.h = surf->h;
+		SDL_FreeSurface(surf);
+		return image;
+	}
+	if (strcicmp(extension, "PNG") || strcicmp(extension, "JPG") || strcicmp(extension, "JPEG") || strcicmp(extension, "TGA") || strcicmp(extension, "GIF"))
+#ifdef QS2D_INCLUDE_STBIMAGE
+	{
+		int req_format = STBI_rgb_alpha;
+		int width, height, orig_format;
+		unsigned char* data = stbi_load(path, &width, &height, &orig_format, req_format);
+		if (data == NULL) {
+			SDL_Log("Loading image failed: %s", stbi_failure_reason());
+			exit(1);
+		}
+		int depth, pitch;
+		Uint32 pixel_format;
+		if (req_format == STBI_rgb) {
+			depth = 24;
+			pitch = 3 * width;
+			pixel_format = SDL_PIXELFORMAT_RGB24;
+		}
+		else {
+			depth = 32;
+			pitch = 4 * width;
+			pixel_format = SDL_PIXELFORMAT_RGBA32;
+		}
+		SDL_Surface* surf = SDL_CreateRGBSurfaceWithFormatFrom((void*)data, width, height,
+			depth, pitch, pixel_format);
+		image.handle = SDL_CreateTextureFromSurface(internal->render, surf);
+		image.w = surf->w; image.h = surf->h;
+		SDL_FreeSurface(surf);
+		return image;
+	}
+#else
+	{
+		QS2D_Log("You need to define QS2D_INCLUDE_STBIMAGE to use this file format");
+	}
+#endif
+	QS2D_Log("Error loading the image, format is not correct, a dummy image has been created");
+	QS2D_Image image = { 0 };
+	SDL_Surface* surf = SDL_CreateRGBSurface(SDL_SWSURFACE, 128, 128, 32, rmask, gmask, bmask, amask);
+	SDL_Renderer * render = SDL_CreateSoftwareRenderer(surf);
+	SDL_Rect my_rect = { 0,0,128,128 };
+	SDL_Color my_color = { 255,0,0,255 };
+	image.w = surf->w; image.h = surf->h;
+	SDL_RenderFillRect(render, &my_rect);
+	SDL_RenderDrawLine(render, 0,0,128,128);
+	SDL_RenderDrawLine(render, 128,0,0,128);
+	image.handle = SDL_CreateTextureFromSurface(internal->render, surf);
+	SDL_DestroyRenderer(render);
+	SDL_FreeSurface(surf);
+	return image;
 }
 #endif
