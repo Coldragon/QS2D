@@ -187,7 +187,7 @@ QS2D_INLINE void QS2D_Draw_Line(const float x1, const float y1, const float x2, 
 }
 QS2D_INLINE void QS2D_Draw_Image(QS2D_Image * image, const float x, const float y, const float scale_w, const float scale_h, const float degree_rotation)
 {
-	SDL_FRect my_rect = { x, y, image->w * scale_w == 0 ? 1 : scale_w, image->h * scale_h == 0 ? 1 : scale_h };
+	SDL_FRect my_rect = { x, y, image->w * (scale_w == 0 ? 1 : scale_w), image->h * (scale_h == 0 ? 1 : scale_h) };
 	SDL_RenderCopyExF(internal->render, image->handle, NULL, &my_rect, degree_rotation, NULL, SDL_FLIP_NONE);
 }
 
@@ -339,4 +339,3 @@ QS2D_INLINE QS2D_Image QS2D_Image_Load(const char* path)
 	image.handle = error_texture_cache;
 	return image;
 }
-#endif

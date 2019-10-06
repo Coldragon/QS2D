@@ -24,7 +24,7 @@ SOFTWARE.
 #define QS2D_INCLUDE_QS2D_H
 #include <SDL2/SDL.h>
 #include <stdbool.h>
-#define QS2D_VERSION "010"
+#define QS2D_VERSION "012"
 #ifdef QS2D_USE_STATIC
 #define QS2D_DEF static
 #else
@@ -52,7 +52,7 @@ typedef struct QS2D_Data {
 } QS2D_Data;
 typedef struct QS2D_Point { QS2D_Float x, y; } QS2D_Point;
 typedef struct QS2D_Rect { QS2D_Float x, y, w, h; } QS2D_Rect;
-typedef struct QS2D_Image { QS2D_Float w, h; SDL_Texture* handle; } QS2D_Image;
+typedef struct QS2D_Image { int w, h; SDL_Texture* handle; } QS2D_Image;
 QS2D_DEF void QS2D_Init(const char* name, const int width, const int height);
 QS2D_DEF void QS2D_Close();
 QS2D_DEF void QS2D_Log(const char* format, ...);
@@ -73,7 +73,7 @@ QS2D_DEF void QS2D_Draw_Pixel(const float x, const float y);
 QS2D_DEF void QS2D_Draw_Rect(const float x, const float y, const float w, const float h);
 QS2D_DEF void QS2D_Draw_FilledRect(const float x, const float y, const float w, const float h);
 QS2D_DEF void QS2D_Draw_Line(const float x1, const float y1, const float x2, const float y2);
-QS2D_DEF void QS2D_Draw_Image(QS2D_Image* image, const float x, const float y, float scale_w, float scale_h, const float degree_rotation);
+QS2D_DEF void QS2D_Draw_Image(QS2D_Image* image, const float x, const float y, const float scale_w, const float scale_h, const float degree_rotation);
 QS2D_DEF void QS2D_Screen_SetBGColor(QS2D_Color c);
 QS2D_DEF QS2D_Color QS2D_Screen_GetBGColor();
 QS2D_DEF void QS2D_Screen_Resize(int w, int h);
@@ -316,11 +316,9 @@ QS2D_INLINE void QS2D_Draw_Line(const float x1, const float y1, const float x2, 
 {
 	SDL_RenderDrawLineF(internal->render, x1, y1, x2, y2);
 }
-QS2D_INLINE void QS2D_Draw_Image(QS2D_Image * image, const float x, const float y, float scale_w, float scale_h, const float degree_rotation)
+QS2D_INLINE void QS2D_Draw_Image(QS2D_Image * image, const float x, const float y, const float scale_w, const float scale_h, const float degree_rotation)
 {
-	scale_h = scale_h == 0 ? 1 : scale_h;
-	scale_w = scale_w == 0 ? 1 : scale_w;
-	SDL_FRect my_rect = { x, y, image->w * scale_w, image->h * scale_h };
+	SDL_FRect my_rect = { x, y, image->w * scale_w == 0 ? 1 : scale_w, image->h * scale_h == 0 ? 1 : scale_h };
 	SDL_RenderCopyExF(internal->render, image->handle, NULL, &my_rect, degree_rotation, NULL, SDL_FLIP_NONE);
 }
 QS2D_INLINE void QS2D_Screen_SetBGColor(QS2D_Color c)
@@ -355,48 +353,39 @@ QS2D_INLINE void QS2D_Screen_Save(const char* path_name)
 	SDL_SaveBMP(s, path_name);
 	SDL_FreeSurface(s);
 }
-QS2D_INLINE char * GetExtension(const char * string_)
+QS2D_INLINE const char* GetExtension(const char* string_)
 {
-	char * ex = strrchr(string_, '.');
+	char const* ex = strrchr(string_, '.');
 	if (!ex || ex == string_)
 	{
 		return "";
 	}
-	return ex+1;
+	return ex + 1;
 }
-QS2D_INLINE int strcicmp(char const* a, char const* b)
-{
-	for (;; a++, b++) {
-		int d = tolower((unsigned char)* a) - tolower((unsigned char)* b);
-		if (d != 0 || !*a)
-			return d;
-	}
-}
-QS2D_INLINE QS2D_Image QS2D_Image_Load(const char * path)
-{
-	Uint32 rmask, gmask, bmask, amask;
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	rmask = 0xff000000;
-	gmask = 0x00ff0000;
-	bmask = 0x0000ff00;
-	amask = 0x000000ff;
+#ifdef _WIN32 || _WIN64
+#define QS2D_CROSSPLATFORM_STRCICMP(A, B) _stricmp(A, B)
 #else
-	rmask = 0x000000ff;
-	gmask = 0x0000ff00;
-	bmask = 0x00ff0000;
-	amask = 0xff000000;
+#include <strings.h>
+#define QS2D_CROSSPLATFORM_STRCICMP(A, B) strcasecmp(A, B);
 #endif
-	char * extension = GetExtension(path);
-	if(strcicmp(extension, "BMP"))
+QS2D_INLINE QS2D_Image QS2D_Image_Load(const char* path)
+{
+	const char* extension = GetExtension(path);
+	QS2D_Image image = { 0 };
+	if (!QS2D_CROSSPLATFORM_STRCICMP(extension, "BMP"))
 	{
-		QS2D_Image image = { 0 };
 		SDL_Surface* surf = SDL_LoadBMP(path);
-		image.handle = SDL_CreateTextureFromSurface(internal->render, surf);
-		image.w = surf->w; image.h = surf->h;
-		SDL_FreeSurface(surf);
-		return image;
+		if (surf)
+		{
+			image.handle = SDL_CreateTextureFromSurface(internal->render, surf);
+			SDL_QueryTexture(image.handle, NULL, NULL, &image.w, &image.h);
+			SDL_FreeSurface(surf);
+			QS2D_Log("Succes Loading BMP Image %s with size %d, %d", path, image.w, image.h);
+			return image;
+		}
+		QS2D_Log("Error Loading BMP Image %s", path);
 	}
-	if (strcicmp(extension, "PNG") || strcicmp(extension, "JPG") || strcicmp(extension, "JPEG") || strcicmp(extension, "TGA") || strcicmp(extension, "GIF"))
+	if (!QS2D_CROSSPLATFORM_STRCICMP(extension, "PNG") || !QS2D_CROSSPLATFORM_STRCICMP(extension, "JPG") || !QS2D_CROSSPLATFORM_STRCICMP(extension, "JPEG") || !QS2D_CROSSPLATFORM_STRCICMP(extension, "TGA") || !QS2D_CROSSPLATFORM_STRCICMP(extension, "GIF"))
 #ifdef QS2D_INCLUDE_STBIMAGE
 	{
 		int req_format = STBI_rgb_alpha;
@@ -420,29 +409,60 @@ QS2D_INLINE QS2D_Image QS2D_Image_Load(const char * path)
 		}
 		SDL_Surface* surf = SDL_CreateRGBSurfaceWithFormatFrom((void*)data, width, height,
 			depth, pitch, pixel_format);
-		image.handle = SDL_CreateTextureFromSurface(internal->render, surf);
-		image.w = surf->w; image.h = surf->h;
-		SDL_FreeSurface(surf);
-		return image;
+		if (surf)
+		{
+			image.handle = SDL_CreateTextureFromSurface(internal->render, surf);
+			if (image.handle)
+			{
+				image.w = width; image.h = height;
+				SDL_FreeSurface(surf);
+				stbi_image_free(data);
+				return image;
+			}
+		}
+		stbi_image_free(data);
 	}
 #else
 	{
-		QS2D_Log("You need to define QS2D_INCLUDE_STBIMAGE to use this file format");
+		QS2D_Log("You need to define QS2D_INCLUDE_STBIMAGE to use this file format\n");
 	}
 #endif
-	QS2D_Log("Error loading the image, format is not correct, a dummy image has been created");
-	QS2D_Image image = { 0 };
-	SDL_Surface* surf = SDL_CreateRGBSurface(SDL_SWSURFACE, 128, 128, 32, rmask, gmask, bmask, amask);
-	SDL_Renderer * render = SDL_CreateSoftwareRenderer(surf);
-	SDL_Rect my_rect = { 0,0,128,128 };
-	SDL_Color my_color = { 255,0,0,255 };
-	image.w = surf->w; image.h = surf->h;
-	SDL_RenderFillRect(render, &my_rect);
-	SDL_RenderDrawLine(render, 0,0,128,128);
-	SDL_RenderDrawLine(render, 128,0,0,128);
-	image.handle = SDL_CreateTextureFromSurface(internal->render, surf);
-	SDL_DestroyRenderer(render);
-	SDL_FreeSurface(surf);
+	Uint32 rmask, gmask, bmask, amask;
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	rmask = 0xff000000;
+	gmask = 0x00ff0000;
+	bmask = 0x0000ff00;
+	amask = 0x000000ff;
+#else
+	rmask = 0x000000ff;
+	gmask = 0x0000ff00;
+	bmask = 0x00ff0000;
+	amask = 0xff000000;
+#endif
+	static bool error_image = false;
+	static SDL_Texture* error_texture_cache = NULL;
+	image.w = 128; image.h = 128;
+	if (error_image == false)
+	{
+		error_texture_cache = SDL_CreateTexture(internal->render, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 128, 128);
+		if (error_texture_cache != NULL)
+		{
+			SDL_SetRenderTarget(internal->render, error_texture_cache);
+			SDL_RenderClear(internal->render);
+			SDL_SetRenderDrawColor(internal->render, 255, 0, 255, 255);
+			SDL_Rect my_rect = { 0,0,128,128 };
+			SDL_RenderDrawRect(internal->render, &my_rect);
+			SDL_RenderDrawLine(internal->render, 0, 0, 128, 128);
+			SDL_RenderDrawLine(internal->render, 128, 0, 0, 128);
+			SDL_SetRenderTarget(internal->render, NULL);
+			QS2D_Log("A dummy image has been created\n");
+			image.handle = error_texture_cache;
+			error_image = true;
+			return image;
+		}
+		QS2D_Log("Error Dummy error image is not created !\n");
+	}
+	image.handle = error_texture_cache;
 	return image;
 }
 #endif
