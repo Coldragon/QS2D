@@ -23,19 +23,16 @@
     <ClInclude Include="src\Enum.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Functions.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="src\Data.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\Preprocessor.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Inline.h">
+    <ClInclude Include="src\DataTypes.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\DataTypes.h">
+    <ClInclude Include="src\Functions.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

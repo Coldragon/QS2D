@@ -16,7 +16,7 @@ Functions
 ///////////////////////////////////////
 
 /* init */
-QS2D_INLINE void QS2D_Init(const char* name, const int width, const int height)
+void QS2D_Init(const char* name, const int width, const int height)
 {
 	srand(time(NULL));
 
@@ -38,14 +38,14 @@ QS2D_INLINE void QS2D_Init(const char* name, const int width, const int height)
 	internal->window = SDL_CreateWindow(name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_RENDERER_PRESENTVSYNC);
 	internal->render = SDL_CreateRenderer(internal->window, -1, SDL_RENDERER_ACCELERATED);
 }
-QS2D_INLINE void QS2D_Close()
+void QS2D_Close()
 {
 	SDL_DestroyWindow(internal->window);
 	SDL_DestroyRenderer(internal->render);
 	free(internal);
 	SDL_Quit();
 }
-QS2D_INLINE void QS2D_Log(const char* format, ...)
+void QS2D_Log(const char* format, ...)
 {
 	va_list args;
 	va_start(args, format);
@@ -54,34 +54,34 @@ QS2D_INLINE void QS2D_Log(const char* format, ...)
 }
 
 /* rendering */
-QS2D_INLINE void QS2D_Screen_Render()
+void QS2D_Screen_Render()
 {
 	SDL_RenderPresent(internal->render);
 }
-QS2D_INLINE void QS2D_Screen_Clear()
+void QS2D_Screen_Clear()
 {
 	SDL_SetRenderDrawColor(internal->render, internal->background_color.r, internal->background_color.g, internal->background_color.b, 255);
 	SDL_RenderClear(internal->render);
 }
-QS2D_INLINE void QS2D_Screen_AutoRender()
+void QS2D_Screen_AutoRender()
 {
 	internal->autoRender = 1;
 }
-QS2D_INLINE void QS2D_Screen_ManualRender()
+void QS2D_Screen_ManualRender()
 {
 	internal->autoRender = 0;
 }
-QS2D_INLINE void QS2D_Screen_AutoClear()
+void QS2D_Screen_AutoClear()
 {
 	internal->autoClear = 1;
 }
-QS2D_INLINE void QS2D_Screen_ManualClear()
+void QS2D_Screen_ManualClear()
 {
 	internal->autoClear = 0;
 }
 
 /* event */
-QS2D_INLINE int QS2D_Input_Handle()
+int QS2D_Input_Handle()
 {
 	static SDL_Event event;
 
@@ -126,11 +126,11 @@ QS2D_INLINE int QS2D_Input_Handle()
 
 	return !internal->quit;
 }
-QS2D_INLINE void QS2D_Quit()
+void QS2D_Quit()
 {
 	internal->quit = 1;
 }
-QS2D_INLINE bool QS2D_Key_IsPressing(const int button)
+bool QS2D_Key_IsPressing(const int button)
 {
 	if (button < 512)
 	{
@@ -138,7 +138,7 @@ QS2D_INLINE bool QS2D_Key_IsPressing(const int button)
 	}
 	return 0;
 }
-QS2D_INLINE bool QS2D_Key_OnRelease(const int button)
+bool QS2D_Key_OnRelease(const int button)
 {
 	if (button < 512)
 	{
@@ -146,7 +146,7 @@ QS2D_INLINE bool QS2D_Key_OnRelease(const int button)
 	}
 	return 0;
 }
-QS2D_INLINE bool QS2D_Key_OnPress(const int button)
+bool QS2D_Key_OnPress(const int button)
 {
 	if (button < 512)
 	{
@@ -156,68 +156,68 @@ QS2D_INLINE bool QS2D_Key_OnPress(const int button)
 }
 
 /* color */
-QS2D_INLINE QS2D_Color QS2D_Color_New(const Uint8 r, const Uint8 g, const Uint8 b)
+QS2D_Color QS2D_Color_New(const Uint8 r, const Uint8 g, const Uint8 b)
 {
 	const QS2D_Color color = { r, g, b};
 	return color;
 }
 
 /* drawing */
-QS2D_INLINE void QS2D_Draw_ColorSet(const QS2D_Color c)
+void QS2D_Draw_ColorSet(const QS2D_Color c)
 {
 	SDL_SetRenderDrawColor(internal->render, c.r, c.g, c.b, 255);
 }
-QS2D_INLINE void QS2D_Draw_Pixel(const float x, const float y)
+void QS2D_Draw_Pixel(const float x, const float y)
 {
 	SDL_RenderDrawPointF(internal->render, x, y);
 }
-QS2D_INLINE void QS2D_Draw_Rect(const float x, const float y, const float w, const float h)
+void QS2D_Draw_Rect(const float x, const float y, const float w, const float h)
 {
 	SDL_FRect rect = { x,y,w,h };
 	SDL_RenderDrawRectF(internal->render, &rect);
 }
-QS2D_INLINE void QS2D_Draw_FilledRect(const float x, const float y, const float w, const float h)
+void QS2D_Draw_FilledRect(const float x, const float y, const float w, const float h)
 {
 	SDL_FRect rect = { x,y,w,h };
 	SDL_RenderFillRectF(internal->render, &rect);
 }
-QS2D_INLINE void QS2D_Draw_Line(const float x1, const float y1, const float x2, const float y2)
+void QS2D_Draw_Line(const float x1, const float y1, const float x2, const float y2)
 {
 	SDL_RenderDrawLineF(internal->render, x1, y1, x2, y2);
 }
-QS2D_INLINE void QS2D_Draw_Image(QS2D_Image * image, const float x, const float y, const float scale_w, const float scale_h, const float degree_rotation)
+void QS2D_Draw_Image(QS2D_Image * image, const float x, const float y, const float scale_w, const float scale_h, const float degree_rotation)
 {
 	SDL_FRect my_rect = { x, y, image->w * (scale_w == 0 ? 1 : scale_w), image->h * (scale_h == 0 ? 1 : scale_h) };
 	SDL_RenderCopyExF(internal->render, image->handle, NULL, &my_rect, degree_rotation, NULL, SDL_FLIP_NONE);
 }
 
 /* screen */
-QS2D_INLINE void QS2D_Screen_SetBGColor(QS2D_Color c)
+void QS2D_Screen_SetBGColor(QS2D_Color c)
 {
 	internal->background_color = c;
 }
-QS2D_INLINE QS2D_Color QS2D_Screen_GetBGColor()
+QS2D_Color QS2D_Screen_GetBGColor()
 {
 	return internal->background_color;
 }
-QS2D_INLINE void QS2D_Screen_Resize(const int w, const int h)
+void QS2D_Screen_Resize(const int w, const int h)
 {
 	SDL_SetWindowSize(internal->window, w, h);
 	internal->w = w; internal->h = h;
 }
-QS2D_INLINE int QS2D_Screen_GetWidth()
+int QS2D_Screen_GetWidth()
 {
 	int w;
 	SDL_GetWindowSize(internal->window, &w, NULL);
 	return w;
 }
-QS2D_INLINE int QS2D_Screen_GetHeight()
+int QS2D_Screen_GetHeight()
 {
 	int h;
 	SDL_GetWindowSize(internal->window, NULL, &h);
 	return h;
 }
-QS2D_INLINE void QS2D_Screen_Save(const char* path_name)
+void QS2D_Screen_Save(const char* path_name)
 {
 	SDL_Surface* s = SDL_CreateRGBSurface(0, internal->w, internal->h, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
 	SDL_RenderReadPixels(internal->render, NULL, SDL_PIXELFORMAT_ARGB8888, s->pixels, s->pitch);
@@ -226,7 +226,7 @@ QS2D_INLINE void QS2D_Screen_Save(const char* path_name)
 }
 
 /* image */
-QS2D_INLINE const char* GetExtension(const char* string_)
+const char* GetExtension(const char* string_)
 {
 	char const* ex = strrchr(string_, '.');
 	if (!ex || ex == string_)
@@ -242,7 +242,7 @@ QS2D_INLINE const char* GetExtension(const char* string_)
 #define QS2D_CROSSPLATFORM_STRCICMP(A, B) strcasecmp(A, B);
 #endif
 
-QS2D_INLINE QS2D_Image QS2D_Image_Load(const char* path)
+QS2D_Image QS2D_Image_Load(const char* path)
 {
 	const char* extension = GetExtension(path);
 	QS2D_Image image = { 0 };

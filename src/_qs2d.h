@@ -45,10 +45,10 @@ SOFTWARE.
 
 #include <time.h>
 #include <stdlib.h>
-#include "Inline.h"
 #include "Data.h"
 #include "Functions.h"
 
+#undef QS2D_IMPLEMENTATION
 #endif // QS2D_IMPLEMENTATION
 
 ///////////////////////////////////////////////////////////////////////
