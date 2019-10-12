@@ -235,7 +235,7 @@ const char* GetExtension(const char* string_)
 	}
 	return ex + 1;
 }
-#ifdef _WIN32 || _WIN64
+#if defined(_WIN32) || defined(_WIN64)
 #define QS2D_CROSSPLATFORM_STRCICMP(A, B) _stricmp(A, B)
 #else
 #include <strings.h>
